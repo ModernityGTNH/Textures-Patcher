@@ -12,11 +12,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 import net.minecraftforge.fluids.FluidTank;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 public final class GalacticraftMachineTextures {
 
@@ -31,6 +33,16 @@ public final class GalacticraftMachineTextures {
     private static final int KIND_FUEL_LOADER = 5;
 
     private static final int KIND_WORKBENCH = 6;
+
+    private static final int KIND_COAL_GENERATOR = 7;
+
+    private static final int KIND_COMPRESSOR = 8;
+
+    private static final int KIND_ELECTRIC_COMPRESSOR = 9;
+
+    private static final int STATE_UNKNOWN = Integer.MIN_VALUE;
+
+    private static final int FUEL_STATE_BASE = 100;
 
     private static final String TILE_COAL_GENERATOR = "micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator";
 
@@ -47,7 +59,6 @@ public final class GalacticraftMachineTextures {
     private static final String TILE_FUEL_LOADER = "micdoodle8.mods.galacticraft.core.tile.TileEntityFuelLoader";
 
     private static final String DOMAIN = "galacticraftcore:";
-
 
     private static final String VANILLA_COAL_GENERATOR = DOMAIN + "coalGenerator";
 
@@ -73,9 +84,9 @@ public final class GalacticraftMachineTextures {
 
     private static final Map<Class<?>, Field> FIELD_CACHE = new HashMap<Class<?>, Field>();
 
+    private static final Map<TileEntity, Integer> LAST_MACHINE_STATE = new WeakHashMap<TileEntity, Integer>();
 
-    private static final Map<TileEntity, Integer> LAST_FUEL_LEVEL = new WeakHashMap<TileEntity, Integer>();
-
+    private static final Map<Class<?>, Integer> TILE_KINDS = new HashMap<Class<?>, Integer>();
 
     private static final Map<Block, Integer> MACHINES = new IdentityHashMap<Block, Integer>();
 
@@ -101,7 +112,6 @@ public final class GalacticraftMachineTextures {
 
     private GalacticraftMachineTextures() {}
 
-
     private static final class Pair {
 
         private IIcon idle;
@@ -110,7 +120,6 @@ public final class GalacticraftMachineTextures {
     }
 
 
-    // The following onRegisterXxx will be invoked at the end of corresponding blocks' registerBlockIcons mixin
     public static void onRegisterBlockMachine(IIconRegister register) {
         coalGeneratorIcons = registerPair(
             register,
@@ -148,7 +157,6 @@ public final class GalacticraftMachineTextures {
             PatchConditions.GC_DETECTOR_TOP_ACTIVE);
         int patched = countIcons(detectorSideIcons) + countIcons(detectorTopIcons);
         logState("oxygen detector", PatchConditions.shouldPatchGalacticraftMachines(), patched, 4);
-
         bind(block, KIND_DETECTOR, patched > 0);
     }
 
@@ -208,7 +216,6 @@ public final class GalacticraftMachineTextures {
         logState("NASA workbench", enabled, workbenchBottomIcon != null ? 1 : 0, 1);
         bind(block, KIND_WORKBENCH, workbenchBottomIcon != null);
     }
-
 
     public static IIcon worldIcon(Block block, IBlockAccess world, int x, int y, int z, int side) {
         if (MACHINES.isEmpty() || block == null || world == null) {
@@ -286,7 +293,6 @@ public final class GalacticraftMachineTextures {
         }
     }
 
-
     public static IIcon coalGenerator(IIcon original, boolean running) {
         return pick(coalGeneratorIcons, running, original, VANILLA_COAL_GENERATOR);
     }
@@ -319,8 +325,6 @@ public final class GalacticraftMachineTextures {
         return pick(sealerIcons, running, original, VANILLA_SEALER);
     }
 
-    
-
     public static IIcon fuelLoader(IIcon original, int level) {
         if (!isFuelLoaderIcon(original) || level < 0 || level >= FUEL_LOADER_ICONS.length) {
             return null;
@@ -339,7 +343,6 @@ public final class GalacticraftMachineTextures {
         }
         return false;
     }
-
 
     public static boolean coalGeneratorRunning(TileEntity tile) {
         return intField(tile, TILE_COAL_GENERATOR, "itemCookTime") > 0;
@@ -379,7 +382,6 @@ public final class GalacticraftMachineTextures {
                 return -1;
             }
             FluidTank fluidTank = (FluidTank) tank;
-
             return Math.min(FUEL_LOADER_ICONS.length - 1, fluidTank.getFluidAmount() * FUEL_LOADER_ICONS.length
                 / fluidTank.getCapacity());
         } catch (IllegalAccessException ignored) {
@@ -387,17 +389,80 @@ public final class GalacticraftMachineTextures {
         }
     }
 
-    public static boolean fuelLoaderLevelChanged(TileEntity tile) {
-        int level = fuelLoaderLevel(tile);
-        if (level < 0) {
-            return false;
+
+    public static void refreshIfChanged(TileEntity tile) {
+        if (tile == null) {
+            return;
         }
-        Integer last = LAST_FUEL_LEVEL.get(tile);
-        if (last != null && last.intValue() == level) {
-            return false;
+        World world = tile.getWorldObj();
+        if (world == null || !world.isRemote) {
+            return;
         }
-        LAST_FUEL_LEVEL.put(tile, Integer.valueOf(level));
-        return true;
+        int state = stateSignature(tile);
+        if (state == STATE_UNKNOWN) {
+            return;
+        }
+        Integer last = LAST_MACHINE_STATE.get(tile);
+        if (last != null && last.intValue() == state) {
+            return;
+        }
+        LAST_MACHINE_STATE.put(tile, Integer.valueOf(state));
+        world.markBlockForUpdate(tile.xCoord, tile.yCoord, tile.zCoord);
+    }
+
+    private static int stateSignature(TileEntity tile) {
+        Class<?> clazz = tile.getClass();
+        Integer cached = TILE_KINDS.get(clazz);
+        if (cached == null) {
+            cached = Integer.valueOf(tileKind(clazz));
+            TILE_KINDS.put(clazz, cached);
+        }
+        switch (cached.intValue()) {
+            case KIND_COAL_GENERATOR:
+                return coalGeneratorRunning(tile) ? 1 : 0;
+            case KIND_COMPRESSOR:
+                return compressorRunning(tile) ? 1 : 0;
+            case KIND_ELECTRIC_COMPRESSOR:
+                return electricCompressorRunning(tile) ? 1 : 0;
+            case KIND_COLLECTOR:
+                return collectorRunning(tile) ? 1 : 0;
+            case KIND_DISTRIBUTOR:
+                return distributorRunning(tile) ? 1 : 0;
+            case KIND_SEALER:
+                return sealerRunning(tile) ? 1 : 0;
+            case KIND_FUEL_LOADER: {
+                int level = fuelLoaderLevel(tile);
+                return level < 0 ? STATE_UNKNOWN : FUEL_STATE_BASE + level;
+            }
+            default:
+                return STATE_UNKNOWN;
+        }
+    }
+
+    private static int tileKind(Class<?> clazz) {
+        String name = clazz.getName();
+        if (name.equals(TILE_COAL_GENERATOR)) {
+            return KIND_COAL_GENERATOR;
+        }
+        if (name.equals(TILE_INGOT_COMPRESSOR)) {
+            return KIND_COMPRESSOR;
+        }
+        if (name.equals(TILE_ELECTRIC_INGOT_COMPRESSOR)) {
+            return KIND_ELECTRIC_COMPRESSOR;
+        }
+        if (name.equals(TILE_OXYGEN_COLLECTOR)) {
+            return KIND_COLLECTOR;
+        }
+        if (name.equals(TILE_OXYGEN_DISTRIBUTOR)) {
+            return KIND_DISTRIBUTOR;
+        }
+        if (name.equals(TILE_OXYGEN_SEALER)) {
+            return KIND_SEALER;
+        }
+        if (name.equals(TILE_FUEL_LOADER)) {
+            return KIND_FUEL_LOADER;
+        }
+        return -1;
     }
 
     private static boolean isTile(TileEntity tile, String className) {
