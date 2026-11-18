@@ -1,0 +1,180 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master, main ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '25'
+  RFG_CACHE_PREFIX: rfg-${{ runner.os }}-
+  JAR_NAME: texturespatcher-1.0.0.jar
+
+jobs:
+  build:
+    name: Build & verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          validate-wrappers: true
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Restore RetroFuturaGradle cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/rfg/srg_merged_minecraft.jar
+            build/rfg/*_patched_minecraft-sources.jar*
+          key: ${{ env.RFG_CACHE_PREFIX }}miss
+          restore-keys: |
+            ${{ env.RFG_CACHE_PREFIX }}
+
+      - name: Setup workspace
+        run: ./gradlew --build-cache --stacktrace setupCIWorkspace
+
+      - name: Build
+        run: ./gradlew --build-cache --stacktrace build
+
+      - name: Compute RetroFuturaGradle cache key
+        id: rfg-key
+        shell: bash
+        run: |
+          if compgen -G "build/rfg/*.inputs.sha256" > /dev/null; then
+            digest=$(cat build/rfg/*.inputs.sha256 | sha256sum | cut -c1-32)
+            echo "key=${RFG_CACHE_PREFIX}${digest}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save RetroFuturaGradle cache
+        if: steps.rfg-key.outputs.key != ''
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            build/rfg/srg_merged_minecraft.jar
+            build/rfg/*_patched_minecraft-sources.jar*
+          key: ${{ steps.rfg-key.outputs.key }}
+
+      - name: Verify jar contents and mixin refmap
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          JAR="build/libs/${JAR_NAME}"
+          if [[ ! -f "$JAR" ]]; then
+            echo "::error::找不到构建产物 $JAR"
+            exit 1
+          fi
+          echo "产物：$JAR ($(du -h "$JAR" | cut -f1))"
+
+          python3 - "$JAR" <<'PY'
+          import json, re, sys, zipfile
+
+          jar_path = sys.argv[1]
+          required = [
+              "mcmod.info",
+              "mixins.texturespatcher.json",
+              "mixins.texturespatcher.refmap.json",
+          ]
+
+          with zipfile.ZipFile(jar_path) as z:
+              names = set(z.namelist())
+              missing = [n for n in required if n not in names]
+              if missing:
+                  print(f"::error::jar 内缺少必要文件: {missing}")
+                  sys.exit(1)
+
+              cfg = json.loads(z.read("mixins.texturespatcher.json"))
+              refmap = json.loads(z.read("mixins.texturespatcher.refmap.json"))
+
+          mixins = cfg.get("client", [])
+          if not mixins:
+              print("::error::mixin 配置的 client 数组为空")
+              sys.exit(1)
+
+          package = cfg.get("package", "").replace(".", "/")
+          errors, warnings = [], []
+
+          # 1) 配置里登记的每个 mixin，其 class 必须真的编进了 jar（防止改名/漏编译）
+          for name in mixins:
+              if f"{package}/{name}.class" not in names:
+                  errors.append(f"mixin 类未打包: {package}/{name}.class")
+
+          # 2) refmap 必须存在且有内容，否则说明注解处理器根本没跑
+          mappings = refmap.get("mappings", {})
+          if not mappings:
+              errors.append("refmap 中没有 mappings，注解处理器很可能没跑起来")
+
+          # 3) refmap 的 key 是全限定名（com/xxx/MixinY），配置里是短名，这里对齐后比较
+          unmapped = [n for n in mixins if f"{package}/{n}" not in mappings]
+          if unmapped and len(unmapped) == len(mixins):
+              errors.append(f"全部 mixin 都不在 refmap 中，remap 流程失效: {unmapped}")
+          elif unmapped:
+              # 正常的：整类都是 remap=false 的注入（本工程的 MixinBaseBlockRender 就是）
+              warnings.append(f"未出现在 refmap（通常是 remap=false）: {unmapped}")
+
+          # 4) 有映射的条目必须解析成 srg 名；仍是 MCP 名说明描述符写错、
+          #    匹配到了错误的重载（getIcon 两参/带世界参数那个经典坑）
+          bad = []
+          for name in mixins:
+              for key, value in mappings.get(f"{package}/{name}", {}).items():
+                  if isinstance(value, str) and not re.search(r"func_|field_", value):
+                      bad.append(f"{name}.{key} -> {value}")
+          if bad:
+              errors.append(f"以下注入未解析为 srg 名: {bad}")
+
+          for w in warnings:
+              print(f"::warning::{w}")
+          for e in errors:
+              print(f"::error::{e}")
+          if errors:
+              sys.exit(1)
+
+          total = sum(len(v) for v in mappings.values())
+          print(f"OK: {len(mixins)} 个 mixin、{total} 条注入映射校验通过")
+          for name in sorted(mixins):
+              count = len(mappings.get(package + "/" + name, {}))
+              print(f"  - {name}: {count} 条映射")
+          PY
+
+      - name: Upload mod jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: texturespatcher-jar
+          path: build/libs/${{ env.JAR_NAME }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload jar to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/${{ env.JAR_NAME }}
+          fail_on_unmatched_files: true
