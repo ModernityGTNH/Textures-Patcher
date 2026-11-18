@@ -19,10 +19,10 @@
     "MixinBlockOxygenDistributor",
     "MixinBlockOxygenSealer",
     "MixinBlockVibrationChamber",
+    "MixinGalacticraftMachineTiles",
     "MixinItemCircuitBoard",
     "MixinItemForestryMultiPass",
-    "MixinItemOverlay",
-    "MixinTileEntityFuelLoader"
+    "MixinItemOverlay"
   ],
   "server": [],
   "injectors": {
