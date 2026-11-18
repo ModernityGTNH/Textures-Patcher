@@ -1,0 +1,31 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.texturespatcher.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mixins.texturespatcher.refmap.json",
+  "mixins": [],
+  "client": [
+    "MixinAEBaseBlock",
+    "MixinBaseBlockRender",
+    "MixinBlock",
+    "MixinBlockFuelLoader",
+    "MixinBlockJukebox",
+    "MixinBlockMachine",
+    "MixinBlockMachine2",
+    "MixinBlockNasaWorkbench",
+    "MixinBlockOxygenCollector",
+    "MixinBlockOxygenDetector",
+    "MixinBlockOxygenDistributor",
+    "MixinBlockOxygenSealer",
+    "MixinBlockVibrationChamber",
+    "MixinItemCircuitBoard",
+    "MixinItemForestryMultiPass",
+    "MixinItemOverlay",
+    "MixinTileEntityFuelLoader"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
