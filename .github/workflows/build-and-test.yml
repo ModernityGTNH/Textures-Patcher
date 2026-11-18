@@ -17,7 +17,9 @@ concurrency:
 
 env:
   JAVA_VERSION: '25'
-  RFG_CACHE_PREFIX: rfg-${{ runner.os }}-
+  # workflow-level env cannot use the `runner` context (it does not exist at parse time),
+  # so the OS is hardcoded here; this workflow always runs on ubuntu-24.04.
+  RFG_CACHE_PREFIX: rfg-linux-
   JAR_NAME: texturespatcher-1.0.0.jar
 
 jobs:
