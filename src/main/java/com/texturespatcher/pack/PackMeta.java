@@ -14,7 +14,7 @@ public final class PackMeta {
         boolean enableSeparateForestryElectronTubeTextures, boolean enableSeparateForestryHoneyDropTextures) {
         this.enableTexturesPatcherBlocks = enableTexturesPatcherBlocks;
         this.enableSeparateForestryCircuitBoardTextures = enableSeparateForestryCircuitBoardTextures;
-        this.enableSeparateForestryElectronTubeTextures = enableSeparateForestryElectssronTubeTextures;
+        this.enableSeparateForestryElectronTubeTextures = enableSeparateForestryElectronTubeTextures;
         this.enableSeparateForestryHoneyDropTextures = enableSeparateForestryHoneyDropTextures;
     }
 
