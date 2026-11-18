@@ -17,10 +17,8 @@ concurrency:
 
 env:
   JAVA_VERSION: '25'
-  # workflow-level env cannot use the `runner` context (it does not exist at parse time),
-  # so the OS is hardcoded here; this workflow always runs on ubuntu-24.04.
   RFG_CACHE_PREFIX: rfg-linux-
-  JAR_NAME: texturespatcher-1.0.0.jar
+  ARTIFACT_PREFIX: Textures_Patcher
 
 jobs:
   build:
@@ -65,6 +63,65 @@ jobs:
       - name: Build
         run: ./gradlew --build-cache --stacktrace build
 
+      - name: Prepare artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION=$(sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' build.gradle.kts | head -n 1)
+          if [[ -z "$VERSION" ]]; then
+            echo "::error::didn't get version from build.gradle.kts"
+            exit 1
+          fi
+
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          BRANCH="${BRANCH//\//-}"
+          SHA="${GITHUB_SHA:0:7}"
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            BRANCH="release"
+          fi
+
+          BASE="${ARTIFACT_PREFIX}-${VERSION}-${BRANCH}-${SHA}"
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [[ "$TAG_VERSION" != "$VERSION" ]]; then
+              echo "::error::tag '${GITHUB_REF_NAME}' 与 build.gradle.kts 的 version '${VERSION}' 不一致，请先改版本号再打 tag"
+              exit 1
+            fi
+            echo "tag=${GITHUB_REF_NAME}"
+          fi
+
+          shopt -s nullglob
+          main=() dev=() src=()
+          for f in build/libs/*.jar; do
+            case "$f" in
+              *-dev.jar)     dev+=("$f") ;;
+              *-sources.jar) src+=("$f") ;;
+              *-api.jar)     echo "skip api jar: $f" ;;
+              *)             main+=("$f") ;;
+            esac
+          done
+
+          for pair in "main:${#main[@]}" "dev:${#dev[@]}" "src:${#src[@]}"; do
+            if [[ "${pair#*:}" -ne 1 ]]; then
+              echo "::error::the number of ${pair%%:*} jar in build/libs is ${pair#*:}, which should be 1"
+              ls -l build/libs/ || true
+              exit 1
+            fi
+          done
+
+          rm -rf dist && mkdir -p dist
+          cp "${main[0]}" "dist/${BASE}.jar"
+          cp "${src[0]}"  "dist/${BASE}-source.jar"
+          cp "${dev[0]}"  "dist/${BASE}-dev.jar"
+
+          echo "base=${BASE}" >> "$GITHUB_OUTPUT"
+          echo "jar=dist/${BASE}.jar" >> "$GITHUB_OUTPUT"
+          ls -lh dist/
+
       - name: Compute RetroFuturaGradle cache key
         id: rfg-key
         shell: bash
@@ -89,12 +146,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          JAR="build/libs/${JAR_NAME}"
+          JAR="${{ steps.artifacts.outputs.jar }}"
           if [[ ! -f "$JAR" ]]; then
-            echo "::error::找不到构建产物 $JAR"
+            echo "::error::cannot find product $JAR"
             exit 1
           fi
-          echo "产物：$JAR ($(du -h "$JAR" | cut -f1))"
+          echo "product: $JAR ($(du -h "$JAR" | cut -f1))"
 
           python3 - "$JAR" <<'PY'
           import json, re, sys, zipfile
@@ -110,7 +167,7 @@ jobs:
               names = set(z.namelist())
               missing = [n for n in required if n not in names]
               if missing:
-                  print(f"::error::jar 内缺少必要文件: {missing}")
+                  print(f"::error::jar missing necessary thing: {missing}")
                   sys.exit(1)
 
               cfg = json.loads(z.read("mixins.texturespatcher.json"))
@@ -118,39 +175,33 @@ jobs:
 
           mixins = cfg.get("client", [])
           if not mixins:
-              print("::error::mixin 配置的 client 数组为空")
+              print("::error::mixin configured client array is null")
               sys.exit(1)
 
           package = cfg.get("package", "").replace(".", "/")
           errors, warnings = [], []
 
-          # 1) 配置里登记的每个 mixin，其 class 必须真的编进了 jar（防止改名/漏编译）
           for name in mixins:
               if f"{package}/{name}.class" not in names:
-                  errors.append(f"mixin 类未打包: {package}/{name}.class")
+                  errors.append(f"mixin class not be packaged: {package}/{name}.class")
 
-          # 2) refmap 必须存在且有内容，否则说明注解处理器根本没跑
           mappings = refmap.get("mappings", {})
           if not mappings:
-              errors.append("refmap 中没有 mappings，注解处理器很可能没跑起来")
+              errors.append("no mappings in refmap.")
 
-          # 3) refmap 的 key 是全限定名（com/xxx/MixinY），配置里是短名，这里对齐后比较
           unmapped = [n for n in mixins if f"{package}/{n}" not in mappings]
           if unmapped and len(unmapped) == len(mixins):
-              errors.append(f"全部 mixin 都不在 refmap 中，remap 流程失效: {unmapped}")
+              errors.append(f"all mixin not in refmap, remap process failed: {unmapped}")
           elif unmapped:
-              # 正常的：整类都是 remap=false 的注入（本工程的 MixinBaseBlockRender 就是）
-              warnings.append(f"未出现在 refmap（通常是 remap=false）: {unmapped}")
+              warnings.append(f"didn't appeared in refmap (ussually remap=false): {unmapped}")
 
-          # 4) 有映射的条目必须解析成 srg 名；仍是 MCP 名说明描述符写错、
-          #    匹配到了错误的重载（getIcon 两参/带世界参数那个经典坑）
           bad = []
           for name in mixins:
               for key, value in mappings.get(f"{package}/{name}", {}).items():
                   if isinstance(value, str) and not re.search(r"func_|field_", value):
                       bad.append(f"{name}.{key} -> {value}")
           if bad:
-              errors.append(f"以下注入未解析为 srg 名: {bad}")
+              errors.append(f"The following injection was not resolved to an srg name: {bad}")
 
           for w in warnings:
               print(f"::warning::{w}")
@@ -160,23 +211,26 @@ jobs:
               sys.exit(1)
 
           total = sum(len(v) for v in mappings.values())
-          print(f"OK: {len(mixins)} 个 mixin、{total} 条注入映射校验通过")
+          print(f"OK: {len(mixins)}  mixin、{total} injection mapping verification passed")
           for name in sorted(mixins):
               count = len(mappings.get(package + "/" + name, {}))
               print(f"  - {name}: {count} 条映射")
           PY
 
-      - name: Upload mod jar
+      - name: Upload mod jars
         uses: actions/upload-artifact@v4
         with:
-          name: texturespatcher-jar
-          path: build/libs/${{ env.JAR_NAME }}
+          name: ${{ steps.artifacts.outputs.base }}
+          path: dist/*.jar
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload jar to release
+      - name: Upload jars to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/libs/${{ env.JAR_NAME }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: dist/*.jar
           fail_on_unmatched_files: true

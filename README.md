@@ -134,3 +134,8 @@ Galacticraft machine texture rules:
 - The Fuel Loader is split into 10 levels by tank fill ratio (0 = empty … 9 = full); a missing level keeps the original texture for that level. The block is redrawn immediately when the level changes, without waiting for a chunk rebuild.
 - The running state is read from the machine itself: the Coal Generator uses the remaining burn time, the Compressor / Electric Compressor use crafting progress, the Collector uses the gathered amount, the Distributor uses bubbles, the Sealer uses its own active flag, and the Detector uses the redstone output (metadata).
 - Blocks shown in the inventory always use the `_inactive` texture, or the original texture when that is missing. (The Fuel Loader uses `_0`.)
+---
+
+### License
+
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
