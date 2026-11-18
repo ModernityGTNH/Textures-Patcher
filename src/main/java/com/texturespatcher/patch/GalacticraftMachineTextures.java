@@ -82,7 +82,7 @@ public final class GalacticraftMachineTextures {
 
     private static final Map<String, Integer> LAST_STATE = new HashMap<String, Integer>();
 
-    private static final Map<Class<?>, Field> FIELD_CACHE = new HashMap<Class<?>, Field>();
+    private static final Map<String, Field> FIELD_CACHE = new HashMap<String, Field>();
 
     private static final Map<TileEntity, Integer> LAST_MACHINE_STATE = new WeakHashMap<TileEntity, Integer>();
 
@@ -361,7 +361,13 @@ public final class GalacticraftMachineTextures {
     }
 
     public static boolean distributorRunning(TileEntity tile) {
-        return floatField(tile, TILE_OXYGEN_DISTRIBUTOR, "bubbleSize") >= 1.0F;
+        if (!isTile(tile, TILE_OXYGEN_DISTRIBUTOR)) {
+            return false;
+        }
+        boolean powered = booleanField(tile, TILE_OXYGEN_DISTRIBUTOR, "hasEnoughEnergyToRun");
+        float stored = floatField(tile, TILE_OXYGEN_DISTRIBUTOR, "storedOxygen");
+        float perTick = floatField(tile, TILE_OXYGEN_DISTRIBUTOR, "oxygenPerTick");
+        return powered && stored > perTick;
     }
 
     public static boolean sealerRunning(TileEntity tile) {
@@ -384,7 +390,7 @@ public final class GalacticraftMachineTextures {
             FluidTank fluidTank = (FluidTank) tank;
             return Math.min(FUEL_LOADER_ICONS.length - 1, fluidTank.getFluidAmount() * FUEL_LOADER_ICONS.length
                 / fluidTank.getCapacity());
-        } catch (IllegalAccessException ignored) {
+        } catch (Exception ignored) {
             return -1;
         }
     }
@@ -398,7 +404,12 @@ public final class GalacticraftMachineTextures {
         if (world == null || !world.isRemote) {
             return;
         }
-        int state = stateSignature(tile);
+        int state;
+        try {
+            state = stateSignature(tile);
+        } catch (Exception e) {
+            return;
+        }
         if (state == STATE_UNKNOWN) {
             return;
         }
@@ -472,15 +483,16 @@ public final class GalacticraftMachineTextures {
     }
 
     private static Field fieldOf(Class<?> clazz, String name) {
-        if (FIELD_CACHE.containsKey(clazz)) {
-            return FIELD_CACHE.get(clazz);
+        String key = clazz.getName() + '#' + name;
+        if (FIELD_CACHE.containsKey(key)) {
+            return FIELD_CACHE.get(key);
         }
         Field field = null;
         try {
             field = clazz.getField(name);
         } catch (NoSuchFieldException ignored) {
         }
-        FIELD_CACHE.put(clazz, field);
+        FIELD_CACHE.put(key, field);
         return field;
     }
 
@@ -494,7 +506,7 @@ public final class GalacticraftMachineTextures {
         }
         try {
             return field.getInt(tile);
-        } catch (IllegalAccessException ignored) {
+        } catch (Exception ignored) {
             return 0;
         }
     }
@@ -509,7 +521,7 @@ public final class GalacticraftMachineTextures {
         }
         try {
             return field.getFloat(tile);
-        } catch (IllegalAccessException ignored) {
+        } catch (Exception ignored) {
             return 0.0F;
         }
     }
@@ -524,7 +536,7 @@ public final class GalacticraftMachineTextures {
         }
         try {
             return field.getBoolean(tile);
-        } catch (IllegalAccessException ignored) {
+        } catch (Exception ignored) {
             return false;
         }
     }
