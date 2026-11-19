@@ -144,6 +144,11 @@ public final class PatchConditions {
         return mc != null && isFlagEnabled(mc, PackMetaReader.FLAG_BLOCKS);
     }
 
+    public static boolean shouldPatchSpawnEggs() {
+        Minecraft mc = Minecraft.getMinecraft();
+        return mc != null && isFlagEnabled(mc, PackMetaReader.FLAG_SPAWN_EGG);
+    }
+
     public static boolean isTextureAvailable(ResourceLocation texture) {
         Minecraft mc = Minecraft.getMinecraft();
         return mc != null && texture != null && isTextureAvailable(mc, texture);
@@ -195,6 +200,10 @@ public final class PatchConditions {
                 }
             } else if (PackMetaReader.FLAG_FORESTRY_HONEY_DROP.equals(flagName)) {
                 if (meta.enableSeparateForestryHoneyDropTextures) {
+                    return true;
+                }
+            } else if (PackMetaReader.FLAG_SPAWN_EGG.equals(flagName)) {
+                if (meta.enableSeparateSpawnEggTextures) {
                     return true;
                 }
             }

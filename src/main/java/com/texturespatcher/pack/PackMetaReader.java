@@ -29,6 +29,7 @@ public final class PackMetaReader {
     public static final String FLAG_FORESTRY_CIRCUIT_BOARD = "enableSeparateForestryCircuitBoardTextures";
     public static final String FLAG_FORESTRY_ELECTRON_TUBE = "enableSeparateForestryElectronTubeTextures";
     public static final String FLAG_FORESTRY_HONEY_DROP = "enableSeparateForestryHoneyDropTextures";
+    public static final String FLAG_SPAWN_EGG = "enableSeparateSpawnEggTextures";
 
     private static final String META_NAME = "pack.mcmeta";
 
@@ -60,7 +61,8 @@ public final class PackMetaReader {
             readFlag(flags, FLAG_BLOCKS),
             readFlag(flags, FLAG_FORESTRY_CIRCUIT_BOARD),
             readFlag(flags, FLAG_FORESTRY_ELECTRON_TUBE),
-            readFlag(flags, FLAG_FORESTRY_HONEY_DROP));
+            readFlag(flags, FLAG_FORESTRY_HONEY_DROP),
+            readFlag(flags, FLAG_SPAWN_EGG));
         return meta.isEmpty() ? null : meta;
     }
 

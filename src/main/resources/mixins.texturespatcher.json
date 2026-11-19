@@ -20,8 +20,10 @@
     "MixinBlockOxygenSealer",
     "MixinBlockVibrationChamber",
     "MixinGalacticraftMachineTiles",
+    "MixinItem",
     "MixinItemCircuitBoard",
     "MixinItemForestryMultiPass",
+    "MixinItemMonsterPlacer",
     "MixinItemOverlay"
   ],
   "server": [],
