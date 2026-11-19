@@ -25,6 +25,7 @@
     "MixinItemForestryMultiPass",
     "MixinItemMonsterPlacer",
     "MixinItemOverlay",
+    "MixinItemSpawnEggVN",
     "MixinMetaGeneratedItem",
     "MixinMetaGeneratedItemX32"
   ],

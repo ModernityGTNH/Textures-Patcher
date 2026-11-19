@@ -20,6 +20,7 @@
 | NEI | 铁傀儡刷怪蛋<br>雪傀儡刷怪蛋 | iron_golem_spawn_egg.png<br>snow_golem_spawn_egg.png | / |enableSeparateSpawnEggTextures |
 | Witchery | 村民刷怪蛋 | witchery_villager_spawn_egg.png | / | enableSeparateSpawnEggTextures |
 | Hardcore Ender Expansion　| 末影人刷怪蛋 | hee_enderman_spawn_egg.png | / | enableSeparateSpawnEggTextures |
+| Village Names | 守卫者刷怪蛋<br>远古守卫者刷怪蛋 | villiage_names_guardian_spawn_egg.png<br>villiage_names_elder_guardian_spawn_egg.png | / | enableSeparateSpawnEggTextures |
 | AE2 | 谐振仓 | BlockVibrationChamberTop.png <br>运行时：BlockVibrationChamberTopOn.png<br>BlockVibrationChamberBackOn.png | 顶面<br> 背面 | enableTexturesPatcherBlocks |
 | Forestry | 小型电子板<br>中型电子板<br>大型电子板<br>先进电子板 | circuitBoard_basic.png<br>circuitBoard_enhanced.png<br>circuitBoard_refined.png<br>circuitBoard_intricate.png | / | enableSeparateForestryCircuitBoardTextures |
 | Forestry | 铜电子管<br>锡电子管<br>青铜电子管<br>铁电子管<br>金电子管<br>钻石电子管<br>黑曜石电子管<br>烈焰电子管<br>橡胶电子管<br>绿宝石电子管<br>磷灰石电子管<br>青金石电子管<br>末影电子管<br>铀电子管 | electronTube_copper.png<br>electronTube_tin.png<br>electronTube_bronze.png<br>electronTube_iron.png<br>electronTube_gold.png<br>electronTube_diamond.png<br>electronTube_obsidian.png<br>electronTube_blaze.png<br>electronTube_rubber.png<br>electronTube_emerald.png<br>electronTube_apatite.png<br>electronTube_lapis.png<br>electronTube_ender.png<br>electronTube_uranium.png | / | enableSeparateForestryElectronTubeTextures |
@@ -72,7 +73,7 @@
 
 ### 刷怪蛋的材质修改规则：
 
-- 游戏内注册在minecraft下的材质均放在 `assets/minecraft/textures/items/`，不放在模组路径下（包含Et Futurum Requiem / NEI / Witchery / Hardcore Ender Expansion）。
+- 所有刷怪蛋材质均放在 `assets/minecraft/textures/items/`，不放在模组路径下。
 - 需要注意：GTNH环境下，末影人刷怪蛋被HardcoreEndExpansion覆写，只有`enderman_spawn_egg.png`游戏内的末影人刷怪蛋将保持原版样式不变化。
 
 ### GT铜材料的材质修改规则：
@@ -109,6 +110,7 @@ Currently implemented patches:
 | NEI | Iron Golem Spawn Egg<br>Snow Golem Spawn Egg | iron_golem_spawn_egg.png<br>snow_golem_spawn_egg.png | / | enableSeparateSpawnEggTextures |
 | Witchery | Villager Spawn Egg | witchery_villager_spawn_egg.png | / | enableSeparateSpawnEggTextures |
 | Hardcore Ender Expansion | Enderman Spawn Egg | hee_enderman_spawn_egg.png | / | enableSeparateSpawnEggTextures |
+| Village Names | Guardian Spawn Egg<br>Elder Guardian Spawn Egg | villiage_names_guardian_spawn_egg.png<br>villiage_names_elder_guardian_spawn_egg.png | / | enableSeparateSpawnEggTextures |
 | AE2 | Vibration Chamber | BlockVibrationChamberTop.png <br>While running: BlockVibrationChamberTopOn.png<br>BlockVibrationChamberBackOn.png | Top<br>Back | enableTexturesPatcherBlocks |
 | Forestry | Basic Circuit Board<br>Enhanced Circuit Board<br>Refined Circuit Board<br>Intricate Circuit Board | circuitBoard_basic.png<br>circuitBoard_enhanced.png<br>circuitBoard_refined.png<br>circuitBoard_intricate.png | / | enableSeparateForestryCircuitBoardTextures |
 | Forestry | Copper Electron Tube<br>Tin Electron Tube<br>Bronze Electron Tube<br>Iron Electron Tube<br>Golden Electron Tube<br>Diamantine Electron Tube<br>Obsidian Electron Tube<br>Blazing Electron Tube<br>Rubberised Electron Tube<br>Emerald Electron Tube<br>Apatine Electron Tube<br>Lapis Electron Tube<br>Ender Electron Tube<br>Uranium238 Electron Tube | electronTube_copper.png<br>electronTube_tin.png<br>electronTube_bronze.png<br>electronTube_iron.png<br>electronTube_gold.png<br>electronTube_diamond.png<br>electronTube_obsidian.png<br>electronTube_blaze.png<br>electronTube_rubber.png<br>electronTube_emerald.png<br>electronTube_apatite.png<br>electronTube_lapis.png<br>electronTube_ender.png<br>electronTube_uranium.png | / | enableSeparateForestryElectronTubeTextures |
@@ -161,7 +163,7 @@ Each toggle is independent, so you may include only one of them. When a single t
 
 ### Spawn egg texture rules:
 
-- Every texture registered in game under `minecraft` goes to `assets/minecraft/textures/items/`, never into a mod path (this includes Et Futurum Requiem / NEI / Witchery / Hardcore Ender Expansion).
+- All the spawn egg textures goes to `assets/minecraft/textures/items/`, never into a mod path.
 - Note: in GTNH the enderman spawn egg is overridden by Hardcore Ender Expansion, so when only `enderman_spawn_egg.png` is provided, the in-game enderman spawn egg keeps its vanilla appearance and stays unchanged.
 
 ### GT copper material items texture rules：
