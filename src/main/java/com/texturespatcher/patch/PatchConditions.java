@@ -149,6 +149,11 @@ public final class PatchConditions {
         return mc != null && isFlagEnabled(mc, PackMetaReader.FLAG_SPAWN_EGG);
     }
 
+    public static boolean shouldPatchGTCopperItems() {
+        Minecraft mc = Minecraft.getMinecraft();
+        return mc != null && isFlagEnabled(mc, PackMetaReader.FLAG_GT_COPPER_ITEM);
+    }
+
     public static boolean isTextureAvailable(ResourceLocation texture) {
         Minecraft mc = Minecraft.getMinecraft();
         return mc != null && texture != null && isTextureAvailable(mc, texture);
@@ -204,6 +209,10 @@ public final class PatchConditions {
                 }
             } else if (PackMetaReader.FLAG_SPAWN_EGG.equals(flagName)) {
                 if (meta.enableSeparateSpawnEggTextures) {
+                    return true;
+                }
+            } else if (PackMetaReader.FLAG_GT_COPPER_ITEM.equals(flagName)) {
+                if (meta.enableSeparateGTCopperItemTextures) {
                     return true;
                 }
             }

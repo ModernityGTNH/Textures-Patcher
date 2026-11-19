@@ -24,6 +24,7 @@
 | Forestry | 小型电子板<br>中型电子板<br>大型电子板<br>先进电子板 | circuitBoard_basic.png<br>circuitBoard_enhanced.png<br>circuitBoard_refined.png<br>circuitBoard_intricate.png | / | enableSeparateForestryCircuitBoardTextures |
 | Forestry | 铜电子管<br>锡电子管<br>青铜电子管<br>铁电子管<br>金电子管<br>钻石电子管<br>黑曜石电子管<br>烈焰电子管<br>橡胶电子管<br>绿宝石电子管<br>磷灰石电子管<br>青金石电子管<br>末影电子管<br>铀电子管 | electronTube_copper.png<br>electronTube_tin.png<br>electronTube_bronze.png<br>electronTube_iron.png<br>electronTube_gold.png<br>electronTube_diamond.png<br>electronTube_obsidian.png<br>electronTube_blaze.png<br>electronTube_rubber.png<br>electronTube_emerald.png<br>electronTube_apatite.png<br>electronTube_lapis.png<br>electronTube_ender.png<br>electronTube_uranium.png | / | enableSeparateForestryElectronTubeTextures |
 | Forestry | 蜂蜜滴 | honeyDrop.png | / | enableSeparateForestryHoneyDropTextures |
+| GregTech | 铜锭<br>铜粒 | copper_ingot.png<br>copper_nugget.png | / | enableSeparateGTCopperItemTextures |
 | Galacticraft | 燃煤发电机 | coalGenerator_inactive.png<br>运行时：<br>coalGenerator_active.png | 正面 | enableTexturesPatcherBlocks |
 | Galacticraft | 压缩机 | compressor_inactive.png<br>运行时：<br>compressor_active.png | 正面 | enableTexturesPatcherBlocks |
 | Galacticraft | 电动压缩机 | electric_compressor_inactive.png<br>运行时：<br>electric_compressor_active.png | 正面 | enableTexturesPatcherBlocks |
@@ -50,7 +51,8 @@
 >    "enableSeparateForestryCircuitBoardTextures": true,
 >    "enableSeparateForestryElectronTubeTextures": true,
 >    "enableSeparateForestryHoneyDropTextures": true,
->    "enableSeparateSpawnEggTextures": true
+>    "enableSeparateSpawnEggTextures": true,
+>    "enableSeparateGTCopperItemTextures": true
 >  }
 >}
 >```
@@ -60,17 +62,23 @@
 
 ---
 
-Galacticraft 的机器材质修改规则：
+### Galacticraft 的机器材质修改规则：
 
 - `_active` 缺图时回退到 `_inactive`，两张都没有则该机器的贴图完全不修改。
 - 氧气侦测仪的侧面与顶面各自独立判定，缺哪一组就那一组保持原图。
 - 燃料装载机按油箱占比分 10 档（0 空 ~ 9 满），缺哪一档就那一档保持原图；挡位一变就立刻重绘该方块，不用等区块重建。
+- 机器的运行状态取自机器自身：燃煤发电机看煤的剩余燃烧时间，压缩机 / 电动压缩机看加工进度，收集器看采集量，释放机看 `hasEnoughEnergyToRun` 与 `storedOxygen`，供给机看自身 active，侦测仪看红石输出（metadata）。
 - 物品栏中显示的方块始终使用`_inactive`的贴图。缺失则显示原图的贴图。（燃料装载机使用`_0`的贴图）。
 
-刷怪蛋的材质修改规则：
+### 刷怪蛋的材质修改规则：
 
 - 游戏内注册在minecraft下的材质均放在 `assets/minecraft/textures/items/`，不放在模组路径下（包含Et Futurum Requiem / NEI / Witchery / Hardcore Ender Expansion）。
 - 需要注意：GTNH环境下，末影人刷怪蛋被HardcoreEndExpansion覆写，只有`enderman_spawn_egg.png`游戏内的末影人刷怪蛋将保持原版样式不变化。
+
+### GT铜材料的材质修改规则：
+- 注意：GT的铜锭与铜粒的贴图位于`assets/minecraft/textures/items/`而不是GT的文件夹下。
+
+**最近不考虑修改其他GT的材料材质。因为GT那边已经在做材料材质的相关修改了。**
 
 ---
 
@@ -81,8 +89,6 @@ Galacticraft 的机器材质修改规则：
 <br>
 <br>
 <br>
-
-<a id="en"></a>
 
 # Textures Patcher
 
@@ -107,6 +113,7 @@ Currently implemented patches:
 | Forestry | Basic Circuit Board<br>Enhanced Circuit Board<br>Refined Circuit Board<br>Intricate Circuit Board | circuitBoard_basic.png<br>circuitBoard_enhanced.png<br>circuitBoard_refined.png<br>circuitBoard_intricate.png | / | enableSeparateForestryCircuitBoardTextures |
 | Forestry | Copper Electron Tube<br>Tin Electron Tube<br>Bronze Electron Tube<br>Iron Electron Tube<br>Golden Electron Tube<br>Diamantine Electron Tube<br>Obsidian Electron Tube<br>Blazing Electron Tube<br>Rubberised Electron Tube<br>Emerald Electron Tube<br>Apatine Electron Tube<br>Lapis Electron Tube<br>Ender Electron Tube<br>Uranium238 Electron Tube | electronTube_copper.png<br>electronTube_tin.png<br>electronTube_bronze.png<br>electronTube_iron.png<br>electronTube_gold.png<br>electronTube_diamond.png<br>electronTube_obsidian.png<br>electronTube_blaze.png<br>electronTube_rubber.png<br>electronTube_emerald.png<br>electronTube_apatite.png<br>electronTube_lapis.png<br>electronTube_ender.png<br>electronTube_uranium.png | / | enableSeparateForestryElectronTubeTextures |
 | Forestry | Honey Drop | honeyDrop.png | / | enableSeparateForestryHoneyDropTextures |
+| GregTech | Copper Ingot<br>Copper Nugget | copper_ingot.png<br>copper_nugget.png | / | enableSeparateGTCopperItemTextures |
 | Galacticraft | Coal Generator | coalGenerator_inactive.png<br>While running:<br>coalGenerator_active.png | Front | enableTexturesPatcherBlocks |
 | Galacticraft | Compressor | compressor_inactive.png<br>While running:<br>compressor_active.png | Front | enableTexturesPatcherBlocks |
 | Galacticraft | Electric Compressor | electric_compressor_inactive.png<br>While running:<br>electric_compressor_active.png | Front | enableTexturesPatcherBlocks |
@@ -133,7 +140,8 @@ How to enable:
 >    "enableSeparateForestryCircuitBoardTextures": true,
 >    "enableSeparateForestryElectronTubeTextures": true,
 >    "enableSeparateForestryHoneyDropTextures": true,
->    "enableSeparateSpawnEggTextures": true
+>    "enableSeparateSpawnEggTextures": true,
+>    "enableSeparateGTCopperItemTextures": true
 >  }
 >}
 >```
@@ -143,17 +151,23 @@ Each toggle is independent, so you may include only one of them. When a single t
 
 ---
 
-Galacticraft machine texture rules:
+### Galacticraft machine texture rules:
 
 - If `_active` is missing, it falls back to `_inactive`. If both are missing, that machine's textures are left completely untouched.
 - The Oxygen Detector's side and top faces are resolved independently; whichever group is missing keeps its original texture.
 - The Fuel Loader is split into 10 levels by tank fill ratio (0 = empty … 9 = full); a missing level keeps the original texture for that level. The block is redrawn immediately when the level changes, without waiting for a chunk rebuild.
+- The running state is read from the machine itself: the Coal Generator uses the remaining burn time, the Compressor / Electric Compressor use crafting progress, the Collector uses the gathered amount, the Distributor uses `hasEnoughEnergyToRun` and `storedOxygen`, the Sealer uses its own active flag, and the Detector uses the redstone output (metadata).
 - Blocks shown in the inventory always use the `_inactive` texture, or the original texture when that is missing. (The Fuel Loader uses `_0`.)
 
-Spawn egg texture rules:
+### Spawn egg texture rules:
 
 - Every texture registered in game under `minecraft` goes to `assets/minecraft/textures/items/`, never into a mod path (this includes Et Futurum Requiem / NEI / Witchery / Hardcore Ender Expansion).
 - Note: in GTNH the enderman spawn egg is overridden by Hardcore Ender Expansion, so when only `enderman_spawn_egg.png` is provided, the in-game enderman spawn egg keeps its vanilla appearance and stays unchanged.
+
+### GT copper material items texture rules：
+- Notice: GT copper ingot and copper nugget textures goes to `assets/minecraft/textures/items/`, not into GT's path.
+
+**NOT GONNA CHANGE OTHER MATERIAL TEXTURES CURRENTLY FOR GT ALREADY MAKING CHANGES IN PROGRESS.**
 
 ---
 

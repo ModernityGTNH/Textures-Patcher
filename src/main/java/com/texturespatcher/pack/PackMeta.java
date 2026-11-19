@@ -12,14 +12,17 @@ public final class PackMeta {
 
     public final boolean enableSeparateSpawnEggTextures;
 
+    public final boolean enableSeparateGTCopperItemTextures;
+
     public PackMeta(boolean enableTexturesPatcherBlocks, boolean enableSeparateForestryCircuitBoardTextures,
         boolean enableSeparateForestryElectronTubeTextures, boolean enableSeparateForestryHoneyDropTextures,
-        boolean enableSeparateSpawnEggTextures) {
+        boolean enableSeparateSpawnEggTextures, boolean enableSeparateGTCopperItemTextures) {
         this.enableTexturesPatcherBlocks = enableTexturesPatcherBlocks;
         this.enableSeparateForestryCircuitBoardTextures = enableSeparateForestryCircuitBoardTextures;
         this.enableSeparateForestryElectronTubeTextures = enableSeparateForestryElectronTubeTextures;
         this.enableSeparateForestryHoneyDropTextures = enableSeparateForestryHoneyDropTextures;
         this.enableSeparateSpawnEggTextures = enableSeparateSpawnEggTextures;
+        this.enableSeparateGTCopperItemTextures = enableSeparateGTCopperItemTextures;
     }
 
     // no flag is turned on
@@ -27,7 +30,8 @@ public final class PackMeta {
         return !this.enableTexturesPatcherBlocks && !this.enableSeparateForestryCircuitBoardTextures
             && !this.enableSeparateForestryElectronTubeTextures
             && !this.enableSeparateForestryHoneyDropTextures
-            && !this.enableSeparateSpawnEggTextures;
+            && !this.enableSeparateSpawnEggTextures
+            && !this.enableSeparateGTCopperItemTextures;
     }
 
     @Override
@@ -37,6 +41,7 @@ public final class PackMeta {
             + ", enableSeparateForestryElectronTubeTextures=" + this.enableSeparateForestryElectronTubeTextures
             + ", enableSeparateForestryHoneyDropTextures=" + this.enableSeparateForestryHoneyDropTextures
             + ", enableSeparateSpawnEggTextures=" + this.enableSeparateSpawnEggTextures
+            + ", enableSeparateGTCopperItemTextures=" + this.enableSeparateGTCopperItemTextures
             + '}';
     }
 }

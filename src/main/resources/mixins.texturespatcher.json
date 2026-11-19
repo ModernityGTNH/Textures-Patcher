@@ -24,7 +24,9 @@
     "MixinItemCircuitBoard",
     "MixinItemForestryMultiPass",
     "MixinItemMonsterPlacer",
-    "MixinItemOverlay"
+    "MixinItemOverlay",
+    "MixinMetaGeneratedItem",
+    "MixinMetaGeneratedItemX32"
   ],
   "server": [],
   "injectors": {

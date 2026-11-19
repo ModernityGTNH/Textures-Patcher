@@ -1,20 +1,11 @@
-/*
- * Add your dependencies here.
- *
- * Minecraft / Forge / UniMixins 由构建脚本自动引入。
- * Forestry / AE2 只用于编译期（对应补丁需要引用它们的方块与物品类），
- * 运行时如果没装对应模组，Mixin 不会生效，模组其余部分照常工作。
- */
 dependencies {
-    // 只用于编译：Forestry 的 dev 包已经是 MCP 名，直接 compileOnly 即可，不进入运行时依赖。
-    // 关掉传递依赖（Angelica / GTNHLib / curse.maven 那一大串），只需要 Forestry 自身的两个类。
     compileOnly("com.github.GTNewHorizons:ForestryMC:4.11.40:dev") { transitive = false }
 
-    // 同上：只取 AE2 自身的方块类（谐振仓补丁），不要它带的传递依赖。
     compileOnly("com.github.GTNewHorizons:Applied-Energistics-2-Unofficial:rv3-beta-1095-GTNH:dev") {
         transitive = false
     }
 
-    // 同上：只取 Galacticraft 自身的机器方块 / 瓦片类（机器贴图补丁）。
     compileOnly("com.github.GTNewHorizons:Galacticraft:3.4.37-GTNH:dev") { transitive = false }
+
+    compileOnly("com.github.GTNewHorizons:GT5-Unofficial:5.09.54.265:dev") { transitive = false }
 }
