@@ -11,11 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import appeng.block.AEBaseBlock;
 import appeng.block.misc.BlockVibrationChamber;
-import appeng.client.render.BaseBlockRender;
 
 import com.texturespatcher.patch.Ae2VibrationChamberTexture;
 
-@Mixin(BaseBlockRender.class)
+@Mixin(targets = "appeng.client.render.BaseBlockRender")
 public abstract class MixinBaseBlockRender {
     @Inject(method = "getInventoryIcon", at = @At("RETURN"), cancellable = true, remap = false)
     private void texturespatcher$useVibrationChamberIdleTop(IIcon overrideIcon, IIcon faceIcon, AEBaseBlock block,

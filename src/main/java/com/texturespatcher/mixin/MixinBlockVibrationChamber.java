@@ -12,13 +12,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import appeng.block.AEBaseBlock;
-import appeng.block.misc.BlockVibrationChamber;
 import appeng.client.render.BlockRenderInfo;
 import appeng.tile.misc.TileVibrationChamber;
 
 import com.texturespatcher.patch.Ae2VibrationChamberTexture;
 
-@Mixin(BlockVibrationChamber.class)
+@Mixin(targets = "appeng.block.misc.BlockVibrationChamber")
 public abstract class MixinBlockVibrationChamber {
 
     @Inject(method = "getIcon", at = @At("RETURN"), cancellable = true)

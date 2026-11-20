@@ -10,11 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import forestry.core.circuits.ItemCircuitBoard;
-import forestry.core.items.ItemForestryMultiPass;
 
 import com.texturespatcher.patch.ForestryBoardTextures;
 
-@Mixin(ItemForestryMultiPass.class)
+@Mixin(targets = "forestry.core.items.ItemForestryMultiPass")
 public abstract class MixinItemForestryMultiPass {
 
     @Inject(method = "registerIcons", at = @At("TAIL"))

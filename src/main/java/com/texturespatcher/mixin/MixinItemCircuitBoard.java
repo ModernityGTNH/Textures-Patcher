@@ -7,11 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import forestry.core.circuits.ItemCircuitBoard;
 
 import com.texturespatcher.patch.ForestryBoardTextures;
 
-@Mixin(ItemCircuitBoard.class)
+@Mixin(targets = "forestry.core.circuits.ItemCircuitBoard")
 public class MixinItemCircuitBoard {
 
     @Inject(method = "getColorFromItemStack", at = @At("HEAD"), cancellable = true)

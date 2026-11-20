@@ -10,11 +10,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenDistributor;
 
 import com.texturespatcher.patch.GalacticraftMachineTextures;
 
-@Mixin(BlockOxygenDistributor.class)
+@Mixin(targets = "micdoodle8.mods.galacticraft.core.blocks.BlockOxygenDistributor")
 public class MixinBlockOxygenDistributor {
 
     @Inject(method = "registerBlockIcons", at = @At("TAIL"))

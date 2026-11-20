@@ -9,14 +9,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import appeng.block.AEBaseBlock;
 import appeng.block.misc.BlockVibrationChamber;
 
 import com.texturespatcher.patch.Ae2VibrationChamberTexture;
 
-// the icon registration lives on the AE base class, block classes only choose their texture name,
-// so the instanceof check keeps every other AE block untouched
-@Mixin(AEBaseBlock.class)
+@Mixin(targets = "appeng.block.AEBaseBlock")
 public abstract class MixinAEBaseBlock {
 
     @Inject(method = "registerBlockIcons", at = @At("TAIL"))

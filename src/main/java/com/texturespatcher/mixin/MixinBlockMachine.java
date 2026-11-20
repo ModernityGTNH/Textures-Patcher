@@ -11,11 +11,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine;
 
 import com.texturespatcher.patch.GalacticraftMachineTextures;
 
-@Mixin(BlockMachine.class)
+@Mixin(targets = "micdoodle8.mods.galacticraft.core.blocks.BlockMachine")
 public class MixinBlockMachine {
 
     @Inject(method = "registerBlockIcons", at = @At("TAIL"))

@@ -16,7 +16,7 @@ import forestry.core.items.ItemOverlay;
 import com.texturespatcher.patch.ForestryHoneyDropTextures;
 import com.texturespatcher.patch.ForestryTubeTextures;
 
-@Mixin(ItemOverlay.class)
+@Mixin(targets = "forestry.core.items.ItemOverlay")
 public abstract class MixinItemOverlay {
 
     @Inject(method = "registerIcons", at = @At("TAIL"))
