@@ -1,7 +1,7 @@
 [中文](#zh) ・ [English](#en)
 
-# Textures Patcher
 <a id="zh"></a>
+# Textures Patcher
 
 针对 Minecraft 1.7.10 / GTNH 2.9.0 的**纯客户端材质渲染修正**模组。<br>
 用于修复高版本中实现了不同面使用不同材质，而当前环境无法替换特定面的问题。<br>
@@ -12,7 +12,7 @@
 
 ### 当前实现的补丁：
 
-| 模组 | 方块/物品 | 材质名称 | 具体替换面 | 开关 |
+| 模组 | 方块/物品&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; | 材质名称 | 具体替换面 | 开关 |
 | --- | --- | --- | --- | --- |
 | 原版 | 唱片机 | jukebox_bottom.png | 底面 | enableTexturesPatcherBlocks |
 | 原版 | 蝙蝠刷怪蛋<br>烈焰人刷怪蛋<br>洞穴蜘蛛刷怪蛋<br>鸡刷怪蛋<br>牛刷怪蛋<br>苦力怕刷怪蛋<br>末影人刷怪蛋<br>恶魂刷怪蛋<br>马刷怪蛋<br>岩浆怪刷怪蛋<br>哞菇刷怪蛋<br>豹猫刷怪蛋<br>猪刷怪蛋<br>羊刷怪蛋<br>蠹虫刷怪蛋<br>骷髅刷怪蛋<br>史莱姆刷怪蛋<br>蜘蛛刷怪蛋<br>鱿鱼刷怪蛋<br>村民刷怪蛋<br>女巫刷怪蛋<br>狼刷怪蛋<br>僵尸猪人刷怪蛋<br>僵尸刷怪蛋 | bat_spawn_egg.png<br>blaze_spawn_egg.png<br>cave_spider_spawn_egg.png<br>chicken_spawn_egg.png<br>cow_spawn_egg.png<br>creeper_spawn_egg.png<br>enderman_spawn_egg.png<br>ghast_spawn_egg.png<br>horse_spawn_egg.png<br>magma_cube_spawn_egg.png<br>mooshroom_spawn_egg.png<br>ocelot_spawn_egg.png<br>pig_spawn_egg.png<br>sheep_spawn_egg.png<br>silverfish_spawn_egg.png<br>skeleton_spawn_egg.png<br>slime_spawn_egg.png<br>spider_spawn_egg.png<br>squid_spawn_egg.png<br>villager_spawn_egg.png<br>witch_spawn_egg.png<br>wolf_spawn_egg.png<br>zombified_piglin_spawn_egg.png<br>zombie_spawn_egg.png | / | enableSeparateSpawnEggTextures |
@@ -67,8 +67,7 @@
 
 - `_active` 缺图时回退到 `_inactive`，两张都没有则该机器的贴图完全不修改。
 - 氧气侦测仪的侧面与顶面各自独立判定，缺哪一组就那一组保持原图。
-- 燃料装载机按油箱占比分 10 档（0 空 ~ 9 满），缺哪一档就那一档保持原图；挡位一变就立刻重绘该方块，不用等区块重建。
-- 机器的运行状态取自机器自身：燃煤发电机看煤的剩余燃烧时间，压缩机 / 电动压缩机看加工进度，收集器看采集量，释放机看 `hasEnoughEnergyToRun` 与 `storedOxygen`，供给机看自身 active，侦测仪看红石输出（metadata）。
+- 燃料装载机按油箱占比分 10 档（0 空 ~ 9 满），缺哪一档就那一档保持原图。
 - 物品栏中显示的方块始终使用`_inactive`的贴图。缺失则显示原图的贴图。（燃料装载机使用`_0`的贴图）。
 
 ### 刷怪蛋的材质修改规则：
@@ -91,6 +90,8 @@
 <br>
 <br>
 
+<a id="en"></a>
+
 # Textures Patcher
 
 A **client-side texture rendering fix** mod for Minecraft 1.7.10 / GTNH 2.9.0.<br>
@@ -102,7 +103,7 @@ This mod **ships no textures**. It pulls textures from your resource pack to app
 
 Currently implemented patches:
 
-| Mod | Block/Item | Texture name | Face replaced | Toggle |
+| Mod | Block/Item&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; | Texture name | Face replaced | Toggle |
 | --- | --- | --- | --- | --- |
 | Vanilla | Jukebox | jukebox_bottom.png | Bottom | enableTexturesPatcherBlocks |
 | Vanilla | Bat Spawn Egg<br>Blaze Spawn Egg<br>Cave Spider Spawn Egg<br>Chicken Spawn Egg<br>Cow Spawn Egg<br>Creeper Spawn Egg<br>Enderman Spawn Egg<br>Ghast Spawn Egg<br>Horse Spawn Egg<br>Magma Cube Spawn Egg<br>Mooshroom Spawn Egg<br>Ocelot Spawn Egg<br>Pig Spawn Egg<br>Sheep Spawn Egg<br>Silverfish Spawn Egg<br>Skeleton Spawn Egg<br>Slime Spawn Egg<br>Spider Spawn Egg<br>Squid Spawn Egg<br>Villager Spawn Egg<br>Witch Spawn Egg<br>Wolf Spawn Egg<br>Zombified Piglin Spawn Egg<br>Zombie Spawn Egg | bat_spawn_egg.png<br>blaze_spawn_egg.png<br>cave_spider_spawn_egg.png<br>chicken_spawn_egg.png<br>cow_spawn_egg.png<br>creeper_spawn_egg.png<br>enderman_spawn_egg.png<br>ghast_spawn_egg.png<br>horse_spawn_egg.png<br>magma_cube_spawn_egg.png<br>mooshroom_spawn_egg.png<br>ocelot_spawn_egg.png<br>pig_spawn_egg.png<br>sheep_spawn_egg.png<br>silverfish_spawn_egg.png<br>skeleton_spawn_egg.png<br>slime_spawn_egg.png<br>spider_spawn_egg.png<br>squid_spawn_egg.png<br>villager_spawn_egg.png<br>witch_spawn_egg.png<br>wolf_spawn_egg.png<br>zombified_piglin_spawn_egg.png<br>zombie_spawn_egg.png | / | enableSeparateSpawnEggTextures |
@@ -129,7 +130,7 @@ Currently implemented patches:
 ---
 
 How to enable:
-1. Add the texture in your resource pack at the location of another existing face / existing item texture of that block. The name must match the table above.
+1. Add the texture in your resource pack at the location of another existing face / existing item texture of that block / item. The name must match the table above.
 2. Add the fields below to the pack's `pack.mcmeta`, following this example.
 >``` json
 >{
@@ -158,7 +159,6 @@ Each toggle is independent, so you may include only one of them. When a single t
 - If `_active` is missing, it falls back to `_inactive`. If both are missing, that machine's textures are left completely untouched.
 - The Oxygen Detector's side and top faces are resolved independently; whichever group is missing keeps its original texture.
 - The Fuel Loader is split into 10 levels by tank fill ratio (0 = empty … 9 = full); a missing level keeps the original texture for that level. The block is redrawn immediately when the level changes, without waiting for a chunk rebuild.
-- The running state is read from the machine itself: the Coal Generator uses the remaining burn time, the Compressor / Electric Compressor use crafting progress, the Collector uses the gathered amount, the Distributor uses `hasEnoughEnergyToRun` and `storedOxygen`, the Sealer uses its own active flag, and the Detector uses the redstone output (metadata).
 - Blocks shown in the inventory always use the `_inactive` texture, or the original texture when that is missing. (The Fuel Loader uses `_0`.)
 
 ### Spawn egg texture rules:
